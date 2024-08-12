@@ -60,7 +60,7 @@ public class StudentService  implements StudentI  {
 
         try{tx = sess.beginTransaction();
             
-            Query<Student> Query = sess.createQuery("from student",  Student.class);
+            Query<Student> Query = sess.createQuery("from Student",  Student.class);
             StudentList = Query.getResultList();
             tx.commit();
         }
