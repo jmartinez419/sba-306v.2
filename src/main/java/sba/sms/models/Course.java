@@ -34,7 +34,7 @@ public class Course {
     public String Instructor;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.REMOVE, CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "courseSet")
-    Set<Student> students;
+    Set<Student> students = new LinkedHashSet<>();
 
     public Course(String courseName, String instructor) {
         this.courseName = courseName;
@@ -50,12 +50,12 @@ public class Course {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Course course = (Course) o;
-        return courseId == course.courseId && Objects.equals(courseName, course.courseName) && Objects.equals(Instructor, course.Instructor) && Objects.equals(students, course.students);
+        return courseId == course.courseId && Objects.equals(courseName, course.courseName) && Objects.equals(Instructor, course.Instructor);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(courseId, courseName, Instructor, students);
+        return Objects.hash(courseId, courseName, Instructor);
     }
 
 }

@@ -55,7 +55,7 @@ public class Student {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return Objects.equals(courseSet, student.courseSet) && Objects.equals(email, student.email) && Objects.equals(password, student.password) && Objects.equals(name, student.name);
+        return Objects.equals(email, student.email) && Objects.equals(password, student.password) && Objects.equals(name, student.name);
     }
 
     @Override
