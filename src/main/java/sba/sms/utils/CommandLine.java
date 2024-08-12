@@ -50,5 +50,5 @@ public class CommandLine {
         courseService.createCourse(new Course("Microservices", "Eric Heilig"));
 
 
-    }
+  }
 }

@@ -27,7 +27,26 @@ import java.util.Set;
  * generate a logger file.
  */
 
-public class StudentService extends Student implements StudentI  {
+public class StudentService  implements StudentI  {
+
+    @Override
+    public void createStudent(Student student) {
+
+        Session  sess = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null;
+        try{
+            tx = sess.beginTransaction();
+            sess.persist(student);
+            tx.commit();
+        }
+        catch (Exception e){
+            if (tx != null) tx.rollback();
+            throw e;
+        }
+        finally {
+            sess.close();
+        }
+    }
 
 
     @Override
@@ -40,6 +59,7 @@ public class StudentService extends Student implements StudentI  {
          List<Student> StudentList = new ArrayList<>();
 
         try{tx = sess.beginTransaction();
+            
             Query<Student> Query = sess.createQuery("from student",  Student.class);
             StudentList = Query.getResultList();
             tx.commit();
@@ -55,23 +75,6 @@ public class StudentService extends Student implements StudentI  {
     }
 
     @Override
-    public void createStudent(Student student) {
-        Session  sess = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = null;
-        try{tx = sess.beginTransaction();
-           sess.persist(student);
-            tx.commit();
-        }
-        catch (Exception e){
-            if (tx != null) tx.rollback();
-            throw e;
-        }
-        finally {
-            sess.close();
-        }
-    }
-
-    @Override
     public Student getStudentByEmail(String email) {
         Session  sess = HibernateUtil.getSessionFactory().openSession();
 
@@ -79,7 +82,7 @@ public class StudentService extends Student implements StudentI  {
         Student student;
         try{tx = sess.beginTransaction();
 
-            Query<Student> Query = sess.createQuery("Select * from student where email = email ",  Student.class);
+            Query<Student> Query = sess.createQuery("from Student where email =:email ",  Student.class);
             Query.setParameter("email", email);
             student = Query.getSingleResult();
 
@@ -96,34 +99,35 @@ public class StudentService extends Student implements StudentI  {
     }
 
     @Override
-    public boolean validateStudent(String email, String password) throws HibernateException {
+    public boolean validateStudent(String email, String password) {
         Session sess = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = null;
         Student student = sess.get(Student.class, email);
-try {
-    tx = sess.beginTransaction();
+        try {
+            tx = sess.beginTransaction();
 
-    if (student.equals(email) && student.equals(password)) {
+            if (student == null) throw new HibernateException("Student not found");
+            else if (student.getPassword().equals(password)) {
+                return true;
+            }
+            {
+                tx.commit();
+            }
 
-        tx.commit();
-        return true;
-    } else return false;
-
-}
-catch (Exception e){
-    if (tx != null) tx.rollback();
-    throw e;
-}
-finally {
-    sess.close();
-}
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
+        } finally {
+            sess.close();
+        }
+        return false;
     }
 
     @Override
     public void registerStudentToCourse(String email, int courseId) {
         Session  sess = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = null;
-        CourseService getcourseId = null;
+        CourseService getcourseId = new CourseService();
         Student student = getStudentByEmail(email);
 
         try{tx = sess.beginTransaction();
@@ -150,7 +154,7 @@ finally {
 
         try {tx = sess.beginTransaction();
 
-            Query<Course> Query = sess.createQuery("SELECT course.name from student where email");
+            Query<Course> Query = sess.createNativeQuery("select Course.CourseId, Instructor, Course.courseName from Course inner join student_courses on Course.CourseId = student_courses.courses_id where student_email=:email ",Course.class);
             Query.setParameter("email", email);
 
             courseList = Query.getResultList();

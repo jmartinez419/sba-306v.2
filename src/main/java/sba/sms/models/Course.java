@@ -17,6 +17,8 @@ import java.util.Set;
  * information and a mapping of 'courses' that indicate an inverse or referencing side
  * of the relationship. Implement Lombok annotations to eliminate boilerplate code.
  */
+@AllArgsConstructor
+
 @Getter
 @Setter
 
@@ -24,31 +26,20 @@ public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    @ManyToMany (cascade = {CascadeType.DETACH,CascadeType.REMOVE,CascadeType.REMOVE,CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "courses")
-    Set<Course> likedCourses;
-
+    @Column(name = "CourseId")
     public int courseId;
+    @Column(name = "courseName", length = 50, nullable = false)
     public String courseName;
+    @Column(name = "Instructor", length = 50, nullable = false)
     public String Instructor;
-    Set<Student> students;
 
-    public Course(Set<Course> likedCourses, int courseId, String courseName, String instructor, Set<Student> students, Set<Student> student) {
-        this.likedCourses = likedCourses;
-        this.courseId = courseId;
-        this.courseName = courseName;
-        Instructor = instructor;
-        this.students = students;
-        this.student = student;
-    }
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.REMOVE, CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.EAGER, mappedBy = "courseSet")
+    Set<Student> students;
 
     public Course(String courseName, String instructor) {
         this.courseName = courseName;
         Instructor = instructor;
     }
-
-    @ManyToMany(targetEntity = Student.class)
-    private Set<Student> student;
 
     public Course() {
         super();
@@ -59,25 +50,14 @@ public class Course {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Course course = (Course) o;
-        return courseId == course.courseId && Objects.equals(likedCourses, course.likedCourses) && Objects.equals(courseName, course.courseName) && Objects.equals(Instructor, course.Instructor) && Objects.equals(students, course.students) && Objects.equals(student, course.student);
+        return courseId == course.courseId && Objects.equals(courseName, course.courseName) && Objects.equals(Instructor, course.Instructor) && Objects.equals(students, course.students);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(likedCourses, courseId, courseName, Instructor, students, student);
+        return Objects.hash(courseId, courseName, Instructor, students);
     }
 
-    public Object getId() {
-        return null;
-    }
-
-    public Object Name() {
-        return null;
-    }
-
-    public Object getName() {
-        return null;
-    }
 }
 
 

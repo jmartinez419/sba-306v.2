@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 
-
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -18,19 +18,13 @@ import java.util.Set;
  */
 @Entity
 @Table(name="student")
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 
 public class Student {
 
-    @ManyToMany (cascade = {CascadeType.DETACH,CascadeType.REMOVE,CascadeType.REMOVE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
-            @JoinTable(
-                    name="student_courses",
-                    joinColumns = @JoinColumn(name = "student_email"),
-                    inverseJoinColumns = @JoinColumn(name = "courses_id")
-            )
-    Set<Course> likedCourses;
-    Set<Course> courseSet = new LinkedHashSet<>();
 @Id
     @Column(name = "email", length = 50, nullable = false)
     private String email;
@@ -38,17 +32,17 @@ public class Student {
     private String password;
     @Column(name="name",length = 50, nullable = false)
     public String name;
-    @Column(name="courses", length = 50, nullable = false)
-    Set<Course> courses;
 
-    public Student(Set<Course> likedCourses, Set<Course> courseSet, String email, String password, String name, Set<Course> courses) {
-        this.likedCourses = likedCourses;
-        this.courseSet = courseSet;
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.courses = courses;
-    }
+    @ManyToMany (cascade = {CascadeType.DETACH,CascadeType.REMOVE,CascadeType.REMOVE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @JoinTable(
+            name="student_courses",
+            joinColumns = @JoinColumn(name = "student_email"),
+            inverseJoinColumns = @JoinColumn(name = "courses_id")
+    )
+
+    @Column(name="courses", length = 50, nullable = false)
+    Set<Course> courseSet = new LinkedHashSet<>();
+
 
     public Student(String mail, String name, String password) {
         this.email = mail;
@@ -56,26 +50,21 @@ public class Student {
         this.password = password;
 
     }
-
-    public Student() {
-
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return Objects.equals(likedCourses, student.likedCourses) && Objects.equals(email, student.email) && Objects.equals(password, student.password) && Objects.equals(name, student.name) && Objects.equals(courses, student.courses);
+        return Objects.equals(courseSet, student.courseSet) && Objects.equals(email, student.email) && Objects.equals(password, student.password) && Objects.equals(name, student.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(likedCourses, email, password, name, courses);
+        return Objects.hash(email, password, name);
     }
     public void registerCourseHelper (Course courses){
         courseSet.add(courses);
-        courses.getStudent().add(this);
+        courses.getStudents().add(this);
     }
 }
 

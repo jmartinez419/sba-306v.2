@@ -43,7 +43,7 @@ public class CourseService implements CourseI {
 
         try { tx = sess.beginTransaction();
 
-            Query<Course> Query = sess.createQuery("FROM Course where id = :id", Course.class);
+            Query<Course> Query = sess.createQuery("FROM Course where id =:id", Course.class);
             Query.setParameter("id", courseId);
 
             course = Query.getSingleResult();
